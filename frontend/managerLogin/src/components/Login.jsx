@@ -1,7 +1,18 @@
 import { useState } from "react";
 import "./Login.css";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const isActivated = localStorage.getItem("activated");
+    if (!isActivated) {
+      navigate("/");
+    }
+  }, [navigate]);
+
   const [managerId, setManagerId] = useState("");
   const [password, setPassword] = useState("");
 
