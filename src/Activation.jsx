@@ -1,48 +1,41 @@
 import { useState } from "react";
 import "./Activation.css";
 
-interface License {
-  hash: string;
-  checksum: number;
-  expiry: string;
-  used: boolean;
-}
-
 /*
   Example valid activation key 
   ABC123-XYZ
 */
 
-const licenses: License[] = [
+const licenses = [
   {
     // SHA-256 hash of "ABC123-XYZ"
     hash: "e9c5c3b2d4f39c5fa48c99d28f8a4d9a9c0d7aafde4f9eaf88ed7a29c3f1b0a5",
     checksum: 54,
     expiry: "2025-12-31",
-    used: false
-  }
+    used: false,
+  },
 ];
 
-export default function Activation(): JSX.Element {
-  const [keyInput, setKeyInput] = useState<string>("");
-  const [showKey, setShowKey] = useState<boolean>(false);
-  const [message, setMessage] = useState<string>("");
-  const [color, setColor] = useState<string>("");
+export default function Activation() {
+  const [keyInput, setKeyInput] = useState("");
+  const [showKey, setShowKey] = useState(false);
+  const [message, setMessage] = useState("");
+  const [color, setColor] = useState("");
 
   // Simple checksum for integrity check
-  const calculateChecksum = (key: string): number =>
+  const calculateChecksum = (key) =>
     key.split("").reduce((sum, ch) => sum + ch.charCodeAt(0), 0) % 100;
 
   // SHA-256 encryption
-  const hashKey = async (key: string): Promise<string> => {
+  const hashKey = async (key) => {
     const encoded = new TextEncoder().encode(key);
     const buffer = await crypto.subtle.digest("SHA-256", encoded);
     return Array.from(new Uint8Array(buffer))
-      .map(b => b.toString(16).padStart(2, "0"))
+      .map((b) => b.toString(16).padStart(2, "0"))
       .join("");
   };
 
-  const validateKey = async (): Promise<void> => {
+  const validateKey = async () => {
     if (!keyInput.trim()) {
       setMessage("Please enter an activation key");
       setColor("red");
@@ -50,11 +43,13 @@ export default function Activation(): JSX.Element {
     }
 
     const today = new Date().toISOString().split("T")[0];
-    const inputHash = await hashKey(keyInput.trim());
-    const inputChecksum = calculateChecksum(keyInput.trim());
+    const trimmedKey = keyInput.trim();
+
+    const inputHash = await hashKey(trimmedKey);
+    const inputChecksum = calculateChecksum(trimmedKey);
 
     const license = licenses.find(
-      l => l.hash === inputHash && l.checksum === inputChecksum
+      (l) => l.hash === inputHash && l.checksum === inputChecksum
     );
 
     if (!license) {
