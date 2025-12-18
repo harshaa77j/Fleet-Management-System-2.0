@@ -9,7 +9,7 @@ interface License {
 }
 
 /*
-  Example valid activation key (plain text, NOT stored):
+  Example valid activation key 
   ABC123-XYZ
 */
 
