@@ -1,0 +1,111 @@
+/* Reset & base */
+* {
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Full screen background */
+.login-page {
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: linear-gradient(135deg, white);
+}
+
+/* Glassmorphic card */
+.login-card {
+  width: 360px;
+  padding: 32px;
+
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+
+  text-align: center;
+  color:  grey;
+}
+
+/* Title */
+.login-card h2 {
+  margin-bottom: 22px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* Input wrapper */
+.form-group {
+  margin-bottom: 16px;
+}
+
+/* Inputs */
+.login-input {
+  width: 100%;
+  padding: 12px 14px;
+
+  border-radius: 8px;
+  border-color: black ;
+
+  font-size: 14px;
+  color:black;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+/* Placeholder color */
+.login-input::placeholder {
+  color: #999;
+}
+
+/* Focus state */
+.login-input:focus {
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.6);
+}
+
+/* Forgot password */
+.forgot-password {
+  text-align: right;
+  margin-bottom: 20px;
+}
+
+.forgot-password a {
+  font-size: 13px;
+  color: blue;
+  text-decoration: none;
+}
+
+.forgot-password a:hover {
+  text-decoration: underline;
+}
+
+/* Login button */
+.login-button {
+  width: 100%;
+  padding: 12px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #4f46e5;
+  color: #ffffff;
+
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:  0.2s ease;
+}
+
+.login-button:hover {
+  background: #4338ca;
+}
+
+/* Disabled button (future use) */
+.login-button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
