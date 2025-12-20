@@ -62,3 +62,29 @@ model Manager {
   created_at           DateTime     @default(now()) @db.Timestamp(6)
 }
 
+model Worker {
+  worker_id    String @id @default(uuid()) @db.Uuid
+  biometric_id String @unique @db.VarChar(100)
+
+  name         String @db.VarChar(255)
+  phone        String? @db.VarChar(20)
+  address      String? @db.VarChar(255)
+
+  manager_id   String @db.Uuid
+  company_id   String @db.Uuid
+
+  blood_group  String?
+  dependents   Int?
+  dob          DateTime?
+  age          Int?
+
+  status       WorkerStatus @default(ACTIVE)
+  created_at   DateTime @default(now()) @db.Timestamp(6)
+
+  manager      Manager @relation(fields: [manager_id], references: [manager_id])
+  company      Company @relation(fields: [company_id], references: [company_id])
+}
+enum WorkerStatus {
+  ACTIVE
+  INACTIVE
+}
