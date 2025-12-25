@@ -1,25 +1,26 @@
 const express = require("express");
 require("dotenv").config();
-//const pool = require("./config/db");
 const adminAuthRoutes = require("./routes/admin.auth.routes");
+const cors = require("cors");
+const companyRoutes = require("./routes/company.routes");
+const managerOnboardRoutes = require("./routes/manager.onboard.routes");
+const authRoutes = require("./routes/auth.routes");
+const managerAuthRoutes = require("./routes/manager.auth.routes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// app.get("/", async (req, res) => {
-//   try{
-//     const result = await pool.query("SELECT NOW()");
-//     res.json({
-//         status: "backend running",
-//         dbTime: result.rows[0].now
-//     });
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({error: "Database not connected"});
-//   }
-// });
+app.use(cors({
+    origin: "http://127.0.0.1:5500",   // Live Server
+    credentials: true
+}));
+
 app.use(express.json());
 app.use("/admin/auth", adminAuthRoutes);
+app.use("/admin/companies",companyRoutes);
+app.use("/activation", managerOnboardRoutes);
+app.use("/auth", authRoutes);
+app.use("/manager/auth", managerAuthRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
