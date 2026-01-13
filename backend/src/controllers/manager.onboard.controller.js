@@ -85,10 +85,29 @@ exports.onboardManager = async (req, res) => {
             where: {key_id: keyRecord.key_id},
             data : {
                 status: "USED",
-                start_data:  new Data()
+                start_data:  new Date()
             }
         });
 
+        const {rawToken, hash} = generatePasswordToken();
+
+        await prisma.passwordToken.create({
+            data: {
+                token_id: uuidv4(),
+                token_hash: hash,
+                manager_id: manager.manager_id,
+                expires_at: new Date(Date.now() + 30 * 60 * 1000)
+            }
+        });
+
+        const link = `${process.env.APP_BASE_URL}/set-password?token=${rawToken}`;
+
+        await sendEmail({
+            to: manager.email,
+            subject: "Set you password",
+            html: setPasswordEmail(link)
+        });
+        
         res.status(201).json({
             message: "Activation successful. please check your email to set password",
             manager_id: manager.manager_id
@@ -103,25 +122,25 @@ exports.onboardManager = async (req, res) => {
     }
 };
 
-const {rawToken, hash} = generatePasswordToken();
+// const {rawToken, hash} = generatePasswordToken();
 
-await prisma.passwordToken.create({
-    data: {
-        token_id: uuidv4(),
-        token_hash: hash,
-        manager_id: manager.manager_id,
-        expires_at: new Date(Date.now() + 30 * 60 * 1000)
-    }
-});
+// await prisma.passwordToken.create({
+//     data: {
+//         token_id: uuidv4(),
+//         token_hash: hash,
+//         manager_id: manager.manager_id,
+//         expires_at: new Date(Date.now() + 30 * 60 * 1000)
+//     }
+// });
 
-// console.log(
-//     `SET PASSWORD LINK: https://localhost:5001/set-password?token=${rawToken}`
-// );
+// // console.log(
+// //     `SET PASSWORD LINK: https://localhost:5001/set-password?token=${rawToken}`
+// // );
 
-const link = `${process.env.APP_BASE_URL}/set-password?token=${rawToken}`;
+// const link = `${process.env.APP_BASE_URL}/set-password?token=${rawToken}`;
 
-await sendEmail({
-    to: manager.email,
-    subject: "Set your password",
-    html: setPasswordEmail(link)
-});
+// await sendEmail({
+//     to: manager.email,
+//     subject: "Set your password",
+//     html: setPasswordEmail(link)
+// });
