@@ -6,6 +6,7 @@ const companyRoutes = require("./routes/company.routes");
 const managerOnboardRoutes = require("./routes/manager.onboard.routes");
 const authRoutes = require("./routes/auth.routes");
 const managerAuthRoutes = require("./routes/manager.auth.routes");
+const managerProfileRoutes = require("./routes/manager.profile.routes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -21,6 +22,7 @@ app.use("/admin/companies",companyRoutes);
 app.use("/activation", managerOnboardRoutes);
 app.use("/auth", authRoutes);
 app.use("/manager/auth", managerAuthRoutes);
+app.use("/manager",managerProfileRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
