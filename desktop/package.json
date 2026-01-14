@@ -1,0 +1,63 @@
+{
+  "name": "fleet-manager-desktop",
+  "version": "1.0.0",
+  "description": "Fleet Management Desktop App",
+  "main": "main.js",
+  "author": "Your Company",
+  "private": true,
+
+  "scripts": {
+    "dev": "concurrently  \"npm run backend\" \"npm run frontend\" \"npm run electron\"",
+
+    "backend": "cd ../backend && docker compose up",
+
+    "frontend": "cd ../frontend/managerLogin && npm run dev",
+
+    "electron": "wait-on http://localhost:5173 && electron .",
+
+    "build-ui": "cd ../frontend/managerLogin && npm run build",
+
+    "build": "npm run build-ui && electron-builder"
+  },
+
+  "devDependencies": {
+    "electron": "^30.0.0",
+    "electron-builder": "^24.0.0",
+    "concurrently": "^9.0.0",
+    "wait-on": "^7.0.1"
+  },
+
+  "build": {
+    "appId": "com.company.fleetmanager",
+    "productName": "Fleet Manager",
+
+    "directories": {
+      "output": "dist"
+    },
+
+    "files": [
+      "main.js",
+      "preload.js",
+      "../frontend/managerLogin/dist/**/*"
+    ],
+
+    "extraResources": [
+      {
+        "from": "../backend",
+        "to": "backend"
+      }
+    ],
+
+    "win": {
+      "target": "nsis"
+    },
+
+    "mac": {
+      "target": "dmg"
+    },
+
+    "linux": {
+      "target": ["AppImage", "deb"]
+    }
+  }
+}
