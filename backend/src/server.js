@@ -7,6 +7,7 @@ const managerOnboardRoutes = require("./routes/manager.onboard.routes");
 const authRoutes = require("./routes/auth.routes");
 const managerAuthRoutes = require("./routes/manager.auth.routes");
 const managerProfileRoutes = require("./routes/manager.profile.routes");
+const path = require("path");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -18,6 +19,12 @@ app.use(cors({
 }));
 
 app.use(express.json());
+app.use((req, res, next) => {
+  console.log("➡️ HIT:", req.method, req.url);
+  next();
+});
+app.use(express.static(path.join(__dirname, "../public")));
+// app.use(express.json());
 app.use("/admin/auth", adminAuthRoutes);
 app.use("/admin/companies",companyRoutes);
 app.use("/activation", managerOnboardRoutes);
@@ -25,6 +32,9 @@ app.use("/auth", authRoutes);
 app.use("/manager/auth", managerAuthRoutes);
 app.use("/manager",managerProfileRoutes);
 
-app.listen(PORT, () => {
+// app.listen(PORT, () => {
+//   console.log(`Server running on port ${PORT}`);
+// });
+app.listen(PORT,"0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });

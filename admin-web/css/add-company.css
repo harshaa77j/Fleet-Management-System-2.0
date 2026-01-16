@@ -1,0 +1,137 @@
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Body */
+body {
+    background-color: #f4f6f9;
+    color: #333;
+}
+
+/* Navbar */
+.navbar {
+    background-color: #1e293b;
+    color: #fff;
+    padding: 16px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar h1 {
+    font-size: 22px;
+    font-weight: 600;
+}
+
+/* Buttons */
+.btn {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: 0.2s ease-in-out;
+}
+
+.btn.primary {
+    background-color: #2563eb;
+    color: #fff;
+}
+
+.btn.primary:hover {
+    background-color: #1d4ed8;
+}
+
+.btn.secondary {
+    background-color: #334155;
+    color: #fff;
+}
+
+.btn.secondary:hover {
+    background-color: #1f2937;
+}
+
+/* Main Container */
+.container {
+    padding: 30px;
+    max-width: 600px;
+    margin: auto;
+}
+
+/* Card */
+.card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 24px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    margin-bottom: 20px;
+}
+
+.card h2 {
+    margin-bottom: 20px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+/* Form */
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #475569;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    font-size: 14px;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+/* Success Box */
+.success-box {
+    display: none;
+    background-color: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.success-box h3 {
+    margin-bottom: 10px;
+    color: #065f46;
+}
+
+.activation-key {
+    font-size: 20px;
+    font-weight: bold;
+    color: #047857;
+    margin-top: 6px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}

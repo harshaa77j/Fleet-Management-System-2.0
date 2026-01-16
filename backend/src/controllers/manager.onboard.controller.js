@@ -85,7 +85,7 @@ exports.onboardManager = async (req, res) => {
             where: {key_id: keyRecord.key_id},
             data : {
                 status: "USED",
-                start_data:  new Date()
+                start_date:  new Date()
             }
         });
 
@@ -100,7 +100,7 @@ exports.onboardManager = async (req, res) => {
             }
         });
 
-        const link = `${process.env.APP_BASE_URL}/set-password?token=${rawToken}`;
+        const link = `${process.env.APP_BASE_URL}/set-password.html?token=${rawToken}`;
 
         await sendEmail({
             to: manager.email,
@@ -133,9 +133,9 @@ exports.onboardManager = async (req, res) => {
 //     }
 // });
 
-// // console.log(
-// //     `SET PASSWORD LINK: https://localhost:5001/set-password?token=${rawToken}`
-// // );
+// console.log(
+//     `SET PASSWORD LINK: https://localhost:5001/set-password.html?token=${rawToken}`
+// );
 
 // const link = `${process.env.APP_BASE_URL}/set-password?token=${rawToken}`;
 

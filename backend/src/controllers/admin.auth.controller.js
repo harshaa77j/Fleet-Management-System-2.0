@@ -28,7 +28,8 @@ exports.adminLogin = async (req, res) => {
     const token = jwt.sign(
       {
         admin_id: admin.admin_id,
-        email: admin.email
+        email: admin.email,
+        type:"ADMIN"
       },
       process.env.JWT_SECRET,
       {

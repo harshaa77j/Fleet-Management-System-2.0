@@ -23,7 +23,7 @@ exports.setPassword = async (req, res) => {
             return res.status(400).json({message: "Invalid or used token"});
         }
 
-        if(record.expires_at < new Data()){
+        if(record.expires_at < new Date()){
             return res.status(400).json({message: "Token expired"});
         }
 

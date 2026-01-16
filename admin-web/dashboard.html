@@ -1,29 +1,45 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="css/dashboard.css">
 </head>
 <body>
 
-<h2>Admin Dashboard</h2>
-<p id="email"></p>
+    <!-- Top Navbar -->
+    <header class="navbar">
+        <h1>Admin Dashboard</h1>
+        <div class="nav-actions">
+            <button class="btn primary" onclick="goToAddCompany()">➕ Add Company</button>
+            <button class="btn danger" onclick="logout()">Logout</button>
+        </div>
+    </header>
 
-<button onclick="logout()">Logout</button>
+    <!-- Main Content -->
+    <main class="container">
+        <div class="card">
+            <h2>Company List</h2>
 
-<script>
-    const token = localStorage.getItem("adminToken");
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Address</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="companyTableBody">
+                        <!-- Dynamic rows -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
 
-    // 🔐 Block unauthorized access
-    if (!token) {
-        window.location.href = "login.html";
-    }
-
-    function logout() {
-        localStorage.removeItem("adminToken");
-        window.location.href = "login.html";
-    }
-</script>
-
+    <script src="js/dashboard.js"></script>
 </body>
 </html>

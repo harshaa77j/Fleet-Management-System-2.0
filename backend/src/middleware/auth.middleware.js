@@ -33,7 +33,7 @@ module.exports = (requiredType = null) => {
         try{
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-            if(requiredTypr && decoded.type !== requiredType){
+            if(requiredType && decoded.type !== requiredType){
                 return res.status(403).json({message: "Forbidden"});
             }
 
