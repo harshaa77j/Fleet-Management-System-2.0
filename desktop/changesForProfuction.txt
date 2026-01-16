@@ -1,0 +1,83 @@
+ADD CSP in index.html 
+2️⃣ ⚠️ Electron Security Warning (Insecure Content-Security-Policy)
+
+This is the big yellow box, and it sounds scary — but context matters.
+
+What it actually means
+
+In development, Electron allows:
+
+No CSP, or
+
+unsafe-eval
+
+This is common because:
+
+Vite
+
+React Fast Refresh
+
+Source maps
+
+DevTools
+
+all need it.
+
+Electron is warning you as a reminder, not because you’re hacked.
+
+⚠️ Note in the message:
+“This warning will not show up once the app is packaged.”
+That’s key.
+
+Is your app/data safe right now?
+
+✅ Yes, because:
+
+It’s running on localhost
+
+No remote content is injected
+
+No untrusted scripts are loaded
+
+When this becomes dangerous
+
+Only if ALL of these are true:
+
+You load remote URLs (random websites)
+
+You allow nodeIntegration: true
+
+You don’t use contextIsolation
+
+You ship this to users without fixing CSP
+
+You are not doing that.
+
+What to do later (production)
+
+Later, when you package:
+
+Add CSP in index.html
+
+Disable dev-only features
+
+Load only local files
+
+👉 We’ll do this when you switch to production mode.
+
+Verdict:
+🟢 Safe in dev
+🟡 Fix later for production
+🔴 Not an active security issue
+
+For production (later)
+
+We will:
+
+Load frontend via loadFile() (not localhost)
+
+Add strict CSP
+
+Disable DevTools
+
+Package backend properly
