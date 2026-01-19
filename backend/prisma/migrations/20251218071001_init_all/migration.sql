@@ -2,7 +2,7 @@
 CREATE TYPE "CompanyStatus" AS ENUM ('ACTIVE', 'EXPIRED');
 
 -- CreateEnum
-CREATE TYPE "KeyStatus" AS ENUM ('ACTIVE', 'EXPIRED');
+CREATE TYPE "KeyStatus" AS ENUM ('ACTIVE','USED', 'EXPIRED');
 
 -- CreateTable
 CREATE TABLE "Admin" (
