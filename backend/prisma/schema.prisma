@@ -88,6 +88,13 @@ enum WorkerStatus {
   ACTIVE
   INACTIVE
 }
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  HALF_DAY
+  ON_LEAVE
+}
+
 model WorkerStats {
   worker_stats_id String @id @default(uuid()) @db.Uuid
 
