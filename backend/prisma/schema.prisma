@@ -63,26 +63,25 @@ model Manager {
 }
 
 model Worker {
-  worker_id    String @id @default(uuid()) @db.Uuid
-  biometric_id String @unique @db.VarChar(100)
+  worker_id            String       @id @default(uuid()) @db.Uuid
+  biometric_id         String       @unique @db.VarChar(100)
+  name                 String       @db.VarChar(255)
+  phone                String?      @db.VarChar(20)
+  address              String?      @db.VarChar(255)
 
-  name         String @db.VarChar(255)
-  phone        String? @db.VarChar(20)
-  address      String? @db.VarChar(255)
+  manager_id           String       @db.Uuid
+  company_id           String       @db.Uuid
 
-  manager_id   String @db.Uuid
-  company_id   String @db.Uuid
+  blood_group          String?
+  dependents           Int?
+  dob                  DateTime?
+  age                  Int?
 
-  blood_group  String?
-  dependents   Int?
-  dob          DateTime?
-  age          Int?
+  status               WorkerStatus @default(ACTIVE)
+  created_at           DateTime     @default(now()) @db.Timestamp(6)
 
-  status       WorkerStatus @default(ACTIVE)
-  created_at   DateTime @default(now()) @db.Timestamp(6)
-
-  manager      Manager @relation(fields: [manager_id], references: [manager_id])
-  company      Company @relation(fields: [company_id], references: [company_id])
+  manager              Manager      @relation(fields: [manager_id], references: [manager_id])
+  company              Company      @relation(fields: [company_id], references: [company_id])
 }
 enum WorkerStatus {
   ACTIVE
@@ -92,23 +91,85 @@ enum AttendanceStatus {
   PRESENT
   ABSENT
   HALF_DAY
-  ON_LEAVE
+ 
+}
+enum VehicleStatus {
+  ACTIVE
+  IN_MAINTENANCE
+  RETIRED
 }
 
 model WorkerStats {
-  worker_stats_id String @id @default(uuid()) @db.Uuid
+  worker_stats_id     String            @id @default(uuid()) @db.Uuid
 
-  worker_id       String @db.Uuid
-  biometric_id    String @db.VarChar(100)
+  worker_id           String            @db.Uuid
+  biometric_id        String            @db.VarChar(100)
 
-  attendance_status AttendanceStatus @default(ABSENT)
+  attendance_status   AttendanceStatus  @default(ABSENT)
 
-  start_time      DateTime?
-  end_time        DateTime?
+  start_time          DateTime?
+  end_time            DateTime?
 
-  vehicle_id      String? @db.Uuid
+  vehicle_id          String?           @db.Uuid
 
-  created_at      DateTime @default(now()) @db.Timestamp(6)
+  created_at          DateTime          @default(now()) @db.Timestamp(3)
 
-  worker          Worker  @relation(fields: [worker_id], references: [worker_id])
+  worker              Worker            @relation(fields: [worker_id], references: [worker_id])
+}
+model Vehicle {
+  vehicle_id           String           @id @default(uuid()) @db.Uuid
+
+  device_id            String           @unique @db.VarChar(100)
+
+  model                String           @db.VarChar(100)
+  manufacturer         String           @db.VarChar(100)
+
+  battery_capacity_ah  Float?
+  nominal_voltage_v    Float?
+
+  status               VehicleStatus    @default(ACTIVE)
+
+  company_id           String           @db.Uuid
+  company              Company          @relation(fields: [company_id], references: [company_id])
+
+  created_at           DateTime         @default(now()) @db.Timestamp(3)
+}
+model VehicleStats {
+  vehicle_stats_id     String           @id @default(uuid()) @db.Uuid
+
+  vehicle_id           String           @db.Uuid
+  device_id            String           @db.VarChar(100)
+
+  recorded_at          DateTime         @default(now()) @db.Timestamp(6)
+
+  soc                  Float?
+  voltage              Float?
+  current              Float?
+  temperature          Float?
+
+  worker_id            String?          @db.Uuid
+  biometric_id         String?          @db.VarChar(100)
+
+  authenticated        Boolean          @default(false)
+
+  vehicle              Vehicle          @relation(fields: [vehicle_id], references: [vehicle_id])
+  worker               Worker?          @relation(fields: [worker_id], references: [worker_id])
+}
+model Maintenance {
+  maintenance_id       String           @id @default(uuid()) @db.Uuid
+
+  vehicle_id           String           @db.Uuid
+  device_id            String           @db.VarChar(100)
+
+  maintenance_type     String           @db.VarChar(100)
+
+  scheduled_date       DateTime
+  description          String?
+
+  cost                 Float?
+  previous_cost        Float?
+
+  created_at           DateTime        @default(now()) @db.Timestamp(6)
+
+  vehicle              Vehicle         @relation(fields: [vehicle_id], references: [vehicle_id])
 }
