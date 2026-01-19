@@ -88,3 +88,20 @@ enum WorkerStatus {
   ACTIVE
   INACTIVE
 }
+model WorkerStats {
+  worker_stats_id String @id @default(uuid()) @db.Uuid
+
+  worker_id       String @db.Uuid
+  biometric_id    String @db.VarChar(100)
+
+  attendance_status AttendanceStatus @default(ABSENT)
+
+  start_time      DateTime?
+  end_time        DateTime?
+
+  vehicle_id      String? @db.Uuid
+
+  created_at      DateTime @default(now()) @db.Timestamp(6)
+
+  worker          Worker  @relation(fields: [worker_id], references: [worker_id])
+}
