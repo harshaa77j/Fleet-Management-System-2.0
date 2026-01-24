@@ -8,6 +8,8 @@ const authRoutes = require("./routes/auth.routes");
 const managerAuthRoutes = require("./routes/manager.auth.routes");
 const managerProfileRoutes = require("./routes/manager.profile.routes");
 const path = require("path");
+const managerVehicleRoutes = require("./routes/manager.vehicle.routes");
+const managerTelemetryRoutes = require("./routes/manager.telemetry.routes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -31,6 +33,8 @@ app.use("/activation", managerOnboardRoutes);
 app.use("/auth", authRoutes);
 app.use("/manager/auth", managerAuthRoutes);
 app.use("/manager",managerProfileRoutes);
+app.use("/manager", managerVehicleRoutes);
+app.use("/manager",managerTelemetryRoutes);
 
 // app.listen(PORT, () => {
 //   console.log(`Server running on port ${PORT}`);
