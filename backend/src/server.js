@@ -10,6 +10,7 @@ const managerProfileRoutes = require("./routes/manager.profile.routes");
 const path = require("path");
 const managerVehicleRoutes = require("./routes/manager.vehicle.routes");
 const managerTelemetryRoutes = require("./routes/manager.telemetry.routes");
+const managerWorkerRoutes = require("./routes/manager.worker.routes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -26,7 +27,6 @@ app.use((req, res, next) => {
   next();
 });
 app.use(express.static(path.join(__dirname, "../public")));
-// app.use(express.json());
 app.use("/admin/auth", adminAuthRoutes);
 app.use("/admin/companies",companyRoutes);
 app.use("/activation", managerOnboardRoutes);
@@ -35,6 +35,7 @@ app.use("/manager/auth", managerAuthRoutes);
 app.use("/manager",managerProfileRoutes);
 app.use("/manager", managerVehicleRoutes);
 app.use("/manager",managerTelemetryRoutes);
+app.use("/manager", managerWorkerRoutes);
 
 // app.listen(PORT, () => {
 //   console.log(`Server running on port ${PORT}`);
