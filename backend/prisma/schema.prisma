@@ -170,19 +170,38 @@ model VehicleStats {
 
   recorded_at      DateTime @default(now()) @db.Timestamp(6)
 
-  soc              Float?
-  voltage          Float?
-  current          Float?
-  temperature      Float?
+  // Battery electrical metrics
+  voltage_mv       Float?   // Battery Voltage (mV)
+  current_ma       Float?   // Battery Current (mA)
+  temperature_c    Float?   // Temperature (°C)
 
+  // Capacity & percentage
+  soc_percent              Float? // State of Charge (%)
+  soh_percent              Float? // State of Health (%)
+  remaining_capacity_mah   Float? // Remaining Capacity (mAh)
+  full_charge_capacity_mah Float? // Full Charge Capacity (mAh)
+
+  // Time estimates
+  time_to_empty_min   Int? // Time to Empty (minutes)
+  time_to_full_min    Int? // Time to Full (minutes)
+  standby_time_min    Int? // Standby time (minutes)
+  at_rate_time_empty  Int? // At-rate time to empty
+
+  // Health / aging
+  cycle_count         Int? // Charge cycle count
+
+  // Worker authentication 
   worker_id        String?  @db.Uuid
   biometric_id     String?  @db.VarChar(100)
-
   authenticated    Boolean  @default(false)
 
+  // Relations
   vehicle          Vehicle  @relation(fields: [vehicle_id], references: [vehicle_id])
   worker           Worker?  @relation(fields: [worker_id], references: [worker_id])
+
+  @@index([vehicle_id, recorded_at])
 }
+
 model Maintenance {
   maintenance_id   String   @id @default(uuid()) @db.Uuid
 
