@@ -1,11 +1,11 @@
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
 generator client {
   provider      = "prisma-client-js"
   binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Admin {
@@ -18,26 +18,20 @@ model Admin {
 }
 
 model Company {
-  company_id          String         @id @db.Uuid
-  name                String?        @db.VarChar(100)
-  email               String         @unique @db.VarChar(255)
-  phone               String?        @db.VarChar(20)
-  address             String?        @db.VarChar(255)
-  status              CompanyStatus  @default(ACTIVE)
-  created_at          DateTime       @default(now()) @db.Timestamp
-  created_by_admin_id String?        @db.Uuid
-  created_by_admin    Admin?         @relation(fields: [created_by_admin_id], references: [admin_id])
+  company_id          String        @id @db.Uuid
+  name                String?       @db.VarChar(100)
+  email               String        @unique @db.VarChar(255)
+  phone               String?       @db.VarChar(20)
+  address             String?       @db.VarChar(255)
+  status              CompanyStatus @default(ACTIVE)
+  created_at          DateTime      @default(now()) @db.Timestamp(6)
+  created_by_admin_id String?       @db.Uuid
+  activationKeyId     String        @unique @db.Uuid
+  activationKey       ActivationKey @relation(fields: [activationKeyId], references: [key_id])
+  created_by_admin    Admin?        @relation(fields: [created_by_admin_id], references: [admin_id])
   managers            Manager[]
-  activationKeyId     String         @unique @db.Uuid
-  activationKey       ActivationKey? @relation(fields: [activationKeyId], references: [key_id])
-  workers  Worker[]
-  vehicles Vehicle[]
-
-}
-
-enum CompanyStatus {
-  ACTIVE
-  EXPIRED
+  vehicles            Vehicle[]
+  workers             Worker[]
 }
 
 model ActivationKey {
@@ -51,26 +45,18 @@ model ActivationKey {
   company      Company?
 }
 
-enum KeyStatus {
-  ACTIVE
-  USED
-  EXPIRED
-}
-
 model Manager {
-  manager_id    String   @id @default(uuid()) @db.Uuid
-  email         String   @unique @db.VarChar(255)
-  password_hash String
-  name          String?  @db.VarChar(255)
-  phone         String?  @db.VarChar(20)
-  address       String?  @db.VarChar(255)
-  company       Company  @relation(fields: [companyId], references: [company_id])
-  companyId     String   @db.Uuid
-  created_at    DateTime @default(now()) @db.Timestamp(6)
-
+  manager_id     String          @id @default(uuid()) @db.Uuid
+  email          String          @unique @db.VarChar(255)
+  password_hash  String
+  name           String?         @db.VarChar(255)
+  phone          String?         @db.VarChar(20)
+  address        String?         @db.VarChar(255)
+  companyId      String          @db.Uuid
+  created_at     DateTime        @default(now()) @db.Timestamp(6)
+  company        Company         @relation(fields: [companyId], references: [company_id])
   passwordTokens PasswordToken[]
-  workers Worker[]
-
+  workers        Worker[]
 }
 
 model PasswordToken {
@@ -80,143 +66,165 @@ model PasswordToken {
   expires_at DateTime
   used       Boolean  @default(false)
   created_at DateTime @default(now())
-
-  manager Manager @relation(fields: [manager_id], references: [manager_id])
-}
-enum WorkerStatus {
-  ACTIVE
-  INACTIVE
+  manager    Manager  @relation(fields: [manager_id], references: [manager_id])
 }
 
 model Worker {
-  worker_id    String       @id @default(uuid()) @db.Uuid
-  biometric_id String       @unique @db.VarChar(100)
-
-  name         String       @db.VarChar(255)
-  phone        String?      @db.VarChar(20)
-  address      String?      @db.VarChar(255)
-
-  manager_id   String       @db.Uuid
-  company_id   String       @db.Uuid
-
+  worker_id    String         @id @default(uuid()) @db.Uuid
+  biometric_id String         @unique @db.VarChar(100)
+  name         String         @db.VarChar(255)
+  phone        String?        @db.VarChar(20)
+  address      String?        @db.VarChar(255)
+  manager_id   String         @db.Uuid
+  company_id   String         @db.Uuid
   blood_group  String?
   dependents   Int?
   dob          DateTime?
   age          Int?
-
-  status       WorkerStatus @default(ACTIVE)
-  created_at   DateTime     @default(now()) @db.Timestamp(6)
-
-  manager      Manager      @relation(fields: [manager_id], references: [manager_id])
-  company      Company      @relation(fields: [company_id], references: [company_id])
-
-  workerStats  WorkerStats[]
+  status       WorkerStatus   @default(ACTIVE)
+  created_at   DateTime       @default(now()) @db.Timestamp(6)
   vehicleStats VehicleStats[]
-
-}
-enum AttendanceStatus {
-  PRESENT
-  ABSENT
-  HALF_DAY
+  company      Company        @relation(fields: [company_id], references: [company_id])
+  manager      Manager        @relation(fields: [manager_id], references: [manager_id])
+  workerStats  WorkerStats[]
+  dailyReports        DailyVehicleReport[]
 }
 
 model WorkerStats {
   worker_stats_id   String           @id @default(uuid()) @db.Uuid
-
   worker_id         String           @db.Uuid
   biometric_id      String           @db.VarChar(100)
-
   attendance_status AttendanceStatus @default(ABSENT)
-
   start_time        DateTime?
   end_time          DateTime?
-
   vehicle_id        String?          @db.Uuid
-
   created_at        DateTime         @default(now()) @db.Timestamp(6)
-
   worker            Worker           @relation(fields: [worker_id], references: [worker_id])
 }
-enum VehicleStatus {
-  ACTIVE
-  IN_MAINTENANCE
-  RETIRED
-}
+
 model Vehicle {
-  vehicle_id          String        @id @default(uuid()) @db.Uuid
-  device_id           String        @unique @db.VarChar(100)
-
-  model               String        @db.VarChar(100)
-  manufacturer        String        @db.VarChar(100)
-
+  vehicle_id          String         @id @default(uuid()) @db.Uuid
+  device_id           String         @unique @db.VarChar(100)
+  model               String         @db.VarChar(100)
+  manufacturer        String         @db.VarChar(100)
   battery_capacity_ah Float?
   nominal_voltage_v   Float?
-
-  status              VehicleStatus @default(ACTIVE)
-
-  company_id          String        @db.Uuid
-  company             Company       @relation(fields: [company_id], references: [company_id])
-
-  created_at          DateTime      @default(now()) @db.Timestamp(6)
-
-  vehicleStats        VehicleStats[]
+  status              VehicleStatus  @default(ACTIVE)
+  company_id          String         @db.Uuid
+  created_at          DateTime       @default(now()) @db.Timestamp(6)
   maintenances        Maintenance[]
+  company             Company        @relation(fields: [company_id], references: [company_id])
+  vehicleStats        VehicleStats[]
+  dailyReports        DailyVehicleReport[]
 }
+
 model VehicleStats {
-  vehicle_stats_id String   @id @default(uuid()) @db.Uuid
-
-  vehicle_id       String   @db.Uuid
-  device_id        String   @db.VarChar(100)
-
-  recorded_at      DateTime @default(now()) @db.Timestamp(6)
-
-  // Battery electrical metrics
-  voltage_mv       Float?   // Battery Voltage (mV)
-  current_ma       Float?   // Battery Current (mA)
-  temperature_c    Float?   // Temperature (°C)
-
-  // Capacity & percentage
-  soc_percent              Float? // State of Charge (%)
-  soh_percent              Float? // State of Health (%)
-  remaining_capacity_mah   Float? // Remaining Capacity (mAh)
-  full_charge_capacity_mah Float? // Full Charge Capacity (mAh)
-
-  // Time estimates
-  time_to_empty_min   Int? // Time to Empty (minutes)
-  time_to_full_min    Int? // Time to Full (minutes)
-  standby_time_min    Int? // Standby time (minutes)
-  at_rate_time_empty  Int? // At-rate time to empty
-
-  // Health / aging
-  cycle_count         Int? // Charge cycle count
-
-  // Worker authentication 
-  worker_id        String?  @db.Uuid
-  biometric_id     String?  @db.VarChar(100)
-  authenticated    Boolean  @default(false)
-
-  // Relations
-  vehicle          Vehicle  @relation(fields: [vehicle_id], references: [vehicle_id])
-  worker           Worker?  @relation(fields: [worker_id], references: [worker_id])
+  vehicle_stats_id         String   @id @default(uuid()) @db.Uuid
+  vehicle_id               String   @db.Uuid
+  device_id                String   @db.VarChar(100)
+  recorded_at              DateTime @default(now()) @db.Timestamp(6)
+  worker_id                String?  @db.Uuid
+  biometric_id             String?  @db.VarChar(100)
+  authenticated            Boolean  @default(false)
+  at_rate_time_empty       Int?
+  current_ma               Float?
+  cycle_count              Int?
+  full_charge_capacity_mah Float?
+  remaining_capacity_mah   Float?
+  soc_percent              Float?
+  soh_percent              Float?
+  standby_time_min         Int?
+  temperature_c            Float?
+  time_to_empty_min        Int?
+  time_to_full_min         Int?
+  voltage_mv               Float?
+  vehicle                  Vehicle  @relation(fields: [vehicle_id], references: [vehicle_id])
+  worker                   Worker?  @relation(fields: [worker_id], references: [worker_id])
 
   @@index([vehicle_id, recorded_at])
 }
 
 model Maintenance {
   maintenance_id   String   @id @default(uuid()) @db.Uuid
-
   vehicle_id       String   @db.Uuid
   device_id        String   @db.VarChar(100)
-
   maintenance_type String   @db.VarChar(100)
-
   scheduled_date   DateTime
   description      String?
-
   cost             Float?
   previous_cost    Float?
-
   created_at       DateTime @default(now()) @db.Timestamp(6)
-
   vehicle          Vehicle  @relation(fields: [vehicle_id], references: [vehicle_id])
+}
+
+model DailyVehicleReport {
+  report_id       String   @id @default(uuid()) @db.Uuid
+  
+  vehicle_id      String   @db.Uuid
+  device_id       String   @db.VarChar(100)
+  report_date     DateTime @db.Date
+  
+  // Averaged metrics over the day
+  avg_soc_percent Float?
+  avg_soh_percent Float?
+  avg_voltage_mv  Float?
+  avg_current_ma  Float?
+  avg_temp_c      Float?
+  
+  // Min/Max for insights
+  min_soc_percent Float?
+  max_soc_percent Float?
+  min_voltage_mv  Float?
+  max_voltage_mv  Float?
+  max_temp_c      Float?
+  
+  // Operational stats
+  total_cycle_count      Int?
+  operating_hours        Float?
+  total_charge_time_min  Int?
+  total_runtime_min      Int?
+  
+  // Worker info (most frequent worker of the day)
+  primary_worker_id      String?  @db.Uuid
+  primary_biometric_id   String?  @db.VarChar(100)
+  authentication_rate    Float?
+  
+  // Metadata
+  data_points_count Int
+  created_at        DateTime @default(now()) @db.Timestamp(6)
+  
+  // Relations
+  vehicle           Vehicle  @relation(fields: [vehicle_id], references: [vehicle_id])
+  worker            Worker?  @relation(fields: [primary_worker_id], references: [worker_id])
+  
+  @@unique([vehicle_id, report_date])
+  @@index([report_date])
+}
+
+enum CompanyStatus {
+  ACTIVE
+  EXPIRED
+}
+
+enum KeyStatus {
+  ACTIVE
+  EXPIRED
+  USED
+}
+
+enum WorkerStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  HALF_DAY
+}
+
+enum VehicleStatus {
+  ACTIVE
+  IN_MAINTENANCE
+  RETIRED
 }
