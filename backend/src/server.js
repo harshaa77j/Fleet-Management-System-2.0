@@ -1,5 +1,10 @@
+
+
 const express = require("express");
 require("dotenv").config();
+// START MQTT SUBSCRIBERS 
+require("./mqtt/subscribers");
+
 //const pool = require("./config/db");
 const adminAuthRoutes = require("./routes/admin.auth.routes");
 
