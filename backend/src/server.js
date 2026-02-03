@@ -11,6 +11,7 @@ const path = require("path");
 const managerVehicleRoutes = require("./routes/manager.vehicle.routes");
 const managerTelemetryRoutes = require("./routes/manager.telemetry.routes");
 const managerWorkerRoutes = require("./routes/manager.worker.routes");
+const reportsRoutes = require("./routes/reports.routes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -36,10 +37,13 @@ app.use("/manager",managerProfileRoutes);
 app.use("/manager", managerVehicleRoutes);
 app.use("/manager",managerTelemetryRoutes);
 app.use("/manager", managerWorkerRoutes);
+app.use("/api/reports", reportsRoutes);
 
-// app.listen(PORT, () => {
-//   console.log(`Server running on port ${PORT}`);
-// });
+if (process.env.NODE_ENV !== 'test') {
+  require('./scripts/cron');
+  console.log('⏰ Cron jobs initialized - Daily aggregation scheduled');
+}
+
 app.listen(PORT,"0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });
