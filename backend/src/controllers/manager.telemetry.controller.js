@@ -74,7 +74,7 @@ exports.getTelemetryCharts = async (req, res) => {
         if(!vehicle) {
             return res.status(404).json({message : "vehicle not found"});
         }
-
+        const hours = rangeMap[range] || 24;
         const fromTime = new Date(Date.now() - hours * 60 * 60 * 1000);
 
         const telemetry = await prisma.vehicleStats.findMany({
@@ -83,14 +83,14 @@ exports.getTelemetryCharts = async (req, res) => {
                 recorded_at: {gte: fromTime}
             },
             orderBy: {
-                recorded_at: "acs"
+                recorded_at: "asc"
             },
             select: {
                 recorded_at: true,
-                soc: true,
-                voltage: true,
-                current: true,
-                temperature: true
+                soc_percent: true,
+                voltage_mv: true,
+                current_ma: true,
+                temperature_c: true
             }
         });
 
@@ -98,7 +98,7 @@ exports.getTelemetryCharts = async (req, res) => {
             range,
             points: telemetry
         });
-    }catch(errror) {
+    }catch(error) {
         console.error(error);
         res.status(500).json({message: "server error"});
     }

@@ -2,7 +2,7 @@ const prisma = require("../../prisma/client");
 
 exports.addVehicle = async (req, res) => {
     try{
-        const {device_id, model, manufacturer, battery_capacity_ah} = req.body;
+        const {device_id, model, manufacturer, battery_capacity_ah, nominal_voltage_v} = req.body;
         const companyId = req.user.companyId;
 
         if(!device_id || !model || !manufacturer) {
@@ -15,6 +15,7 @@ exports.addVehicle = async (req, res) => {
                 model,
                 manufacturer,
                 battery_capacity_ah,
+                nominal_voltage_v,
                 company_id: companyId,
                 status: "ACTIVE"
             }
@@ -124,10 +125,10 @@ exports.getVehicleDashboard = async (req, res) => {
             select: {
                 vehicle_stats_id: true,
                 recorded_at: true,
-                soc: true,
-                voltage: true,
-                current: true,
-                temperature: true,
+                soc_percent: true,
+                voltage_mv: true,
+                current_ma: true,
+                temperature_c: true,
                 authenticated: true,
                 worker_id: true,
                 biometric_id: true

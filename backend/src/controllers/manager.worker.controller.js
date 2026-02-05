@@ -33,7 +33,7 @@ exports.addWorker = async (req, res) => {
         });
 
         res.status(201).json({
-            meesage : "Worker added successfully",
+            message : "Worker added successfully",
             worker: {
                 worker_id: worker.worker_id,
                 biometric_id: worker.biometric_id,
@@ -111,7 +111,7 @@ exports.assignWorkerToVehicle = async (req, res) => {
         const companyId = req.user.companyId;
 
         if(!worker_id || !vehicle_id){
-            return res.status(400).json({message : "worker_id and vehicle_id are requried"});
+            return res.status(400).json({message : "Worker_id and vehicle_id are requried"});
         }
 
         const worker = await prisma.worker.findFirst({
@@ -181,6 +181,194 @@ exports.assignWorkerToVehicle = async (req, res) => {
             }
         });
     }catch(error){
+        console.error(error);
+        res.status(500).json({message: "Server error"});
+    }
+};
+
+exports.removeWorkerFromVehicle = async (req, res) => {
+    try{
+        const {worker_id} = req.body;
+        const companyId = req.user.companyId;
+
+        if(!worker_id) {
+            return res.status(400).json({message : "Worker_id is required"});
+        }
+
+        const worker = await prisma.worker.findFirst({
+            where: {
+                worker_id,
+                company_id: companyId,
+                status: "ACTIVE"
+            }
+        });
+
+        if(!worker) {
+            return res.status(404).json({message: "Worker not found"});
+        }
+
+        const assignment = await prisma.workerStats.findFirst({
+            where: {
+                worker_id,
+                end_time: null
+            }
+        });
+
+        if(!assignment){
+            return res.status(409).json({message: "Worker is not currently assigned"});
+        }
+
+        await prisma.workerStats.update({
+            where: {
+                worker_stats_id: assignment.worker_stats_id
+            },
+            data:{
+                end_time: new Date()
+            }
+        });
+
+        res.json({message: "Worker removed from vehicle successfully"});
+    }catch(error) {
+        console.error(error);
+        res.status(500).json({message: "Server error"});
+    }
+};
+
+exports.reassignWorkerToVehicle = async (req, res) => {
+    try{
+        const {worker_id, new_vehicle_id} = req.body;
+        const companyId = req.user.companyId;
+
+        if(!worker_id || !new_vehicle_id) {
+            return res.status(400).json({message: "worker_id and new_vehicle_id are required"});
+        }
+
+        const worker = await prisma.worker.findFirst({
+            where: {
+                worker_id,
+                company_id: companyId,
+                status: "ACTIVE"
+            }
+        });
+
+        if(!worker){
+            return res.status(404).json({message: "Worker not found"});
+        }
+
+        const vehicle = await prisma.vehicle.findFirst({
+            where: {
+                vehicle_id: new_vehicle_id,
+                company_id: companyId,
+                status: {not: "RETIRED"}
+            }
+        });
+
+        if(!vehicle) {
+            return res.status(404).json({message: "Vehicle not found"});
+        }
+
+        const currentAssignment = await prisma.workerStats.findFirst({
+            where: {
+                worker_id,
+                end_time: null
+            }
+        });
+
+        if(!currentAssignment) {
+            return res.status(409).json({message: "Worker is not currently assigned"});
+        }
+
+        const vehicleBusy = await prisma.workerStats.findFirst({
+            where: {
+                vehicle_id: new_vehicle_id,
+                end_time: null
+            }
+        });
+
+        if(vehicleBusy) {
+            return res.status(409).json({message: "new vehicle already has a worker assigned"});
+        }
+
+        await prisma.workerStats.update({
+            where: {
+                worker_stats_id: currentAssignment.worker_stats_id
+            },
+            data: {
+                end_time: new Date()
+            }
+        });
+
+        const newAssignment = await prisma.workerStats.create({
+            data: {
+                worker_id,
+                biometric_id: worker.biometric_id,
+                vehicle_id: new_vehicle_id,
+                attendance_status: "ABSENT",
+                start_time: new Date()
+            }
+        });
+
+        res.json({
+            message: "Worker ressigned successfully",
+            assignment: {
+                worker_id,
+                vehicle_id: new_vehicle_id,
+                start_time: newAssignment.start_time
+            }
+        });
+    }catch (error) {
+        console.error(error);
+        res.status(500).json({message: "Server error"});
+    }
+};
+
+exports.deleteWorker = async (req, res) => {
+    try{
+        const {worker_id} = req.params;
+        const companyId = req.user.companyId;
+
+        const worker = await prisma.worker.findFirst({
+            where: {
+                worker_id,
+                company_id: companyId
+            }
+        });
+
+        if(!worker) {
+            return res.status(404).json({message: "Worker not found"});
+        }
+
+        const activeAssignment = await prisma.workerStats.findFirst({
+            where: {
+                worker_id,
+                end_time: null
+            }
+        });
+
+        if(activeAssignment) {
+            await prisma.workerStats.update({
+                where: {
+                    worker_stats_id: activeAssignment.worker_stats_id
+                },
+                data: {
+                    end_time: new Date()
+                }
+            });
+        }
+
+        await prisma.worker.update({
+            where: {
+                worker_id
+            },
+            data: {
+                status: "INACTIVE"
+            }
+        });
+
+        res.json({
+            message: "worker removed successfully"
+        });
+    }catch (error){
         console.error(error);
         res.status(500).json({message: "Server error"});
     }
