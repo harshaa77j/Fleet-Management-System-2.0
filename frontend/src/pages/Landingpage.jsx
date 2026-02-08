@@ -1,6 +1,41 @@
 import "../styles/Landingpage.css";
+import { useEffect, useState } from "react";
 
 export default function Landingpage() {
+  const [vehicles, setVehicles] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchVehicles = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        const res = await fetch("http://localhost:5001/manager/vehicles", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch vehicles");
+        }
+
+        const data = await res.json();
+        setVehicles(data.vehicles || []);
+      } catch (error) {
+        console.error("Error fetching vehicles:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVehicles();
+  }, []);
+
+  const totalVehicles = vehicles.length;
+  const activeVehicles = vehicles.filter(v => v.status === "ACTIVE").length;
+
   return (
     <div className="dashboard">
       {/* SIDEBAR */}
@@ -34,43 +69,41 @@ export default function Landingpage() {
         <main className="content">
           <h1>Welcome back!</h1>
 
-          {/* STATS CONTAINER CARD */}
+          {/* STATS */}
           <div className="stats-container">
             <div className="stats">
-              <Stat title="Total Vehicles" value="150" type="total" />
-              <Stat title="Active Vehicles" value="120" type="active" />
-              <Stat title="Charging Vehicles" value="15" type="charging" />
-              <Stat title="Under Maintenance" value="5" type="maintenance" />
+              <Stat title="Total Vehicles" value={totalVehicles} type="total" />
+              <Stat title="Active Vehicles" value={activeVehicles} type="active" />
+              <Stat title="Charging Vehicles" value="0" type="charging" />
+              <Stat title="Under Maintenance" value="0" type="maintenance" />
             </div>
 
             <div className="last-sync">
-              Last synced <span>2 min ago</span>
+              Last synced <span>just now</span>
             </div>
           </div>
 
-          {/* FORKLIFT STATUS SECTION */}
+          {/* VEHICLE STATUS */}
           <section className="forklift-section">
             <h2 className="section-title">Vehicle Status</h2>
 
             <div className="forklift-grid">
-              <ForkliftCard
-                name="Forklift-01"
-                mac="00:1B:44:11:3A:B7"
-                status="active"
-                progress={90}
-              />
-              <ForkliftCard
-                name="Forklift-02"
-                mac="00:1B:44:11:3A:B8"
-                status="low"
-                progress={30}
-              />
-              <ForkliftCard
-                name="Forklift-03"
-                mac="00:1B:44:11:3A:B9"
-                status="charging"
-                progress={60}
-              />
+              {loading && <p>Loading vehicles...</p>}
+
+              {!loading && vehicles.length === 0 && (
+                <p>No vehicles found</p>
+              )}
+
+              {!loading &&
+                vehicles.map(vehicle => (
+                  <ForkliftCard
+                    key={vehicle.vehicle_id}
+                    name={vehicle.device_id}
+                    mac={vehicle.vehicle_id.slice(0, 8)}
+                    status={vehicle.status === "ACTIVE" ? "active" : "low"}
+                    progress={vehicle.status === "ACTIVE" ? 90 : 30}
+                  />
+                ))}
             </div>
           </section>
         </main>
